@@ -2,10 +2,10 @@ A Flask-based web application designed to simplify movie selection and managemen
 
 Features:
 
-Flask Framework: For developing and deploying the web app.
-Flask-WTF: To handle user input and forms effortlessly.
-Movie API Integration: To browse and select movies.
-SQLAlchemy: For managing data with an SQLite database.
+- Flask Framework: For developing and deploying the web app.
+- Flask-WTF: To handle user input and forms effortlessly.
+- Movie API Integration: To browse and select movies.
+- SQLAlchemy: For managing data with an SQLite database.
 Explore the code, contribute, or provide feedback. Dive into MovieMate and see how modern web technologies come together!
 
 Technologies Used:
