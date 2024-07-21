@@ -10,9 +10,9 @@ Explore the code, contribute, or provide feedback. Dive into MovieMate and see h
 
 Technologies Used:
 
-Python
-Flask
-Flask-WTF
-SQLAlchemy
-SQLite
-Movie API
+- Python
+- Flask
+- Flask-WTF
+- SQLAlchemy
+- SQLite
+- Movie API
