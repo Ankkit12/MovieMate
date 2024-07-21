@@ -8,6 +8,12 @@ from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
 from flask_migrate import Migrate
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+api_key = os.getenv('api_key')
+movie_url = os.getenv('movie_url')
 
 
 app = Flask(__name__)
@@ -147,8 +153,6 @@ class MovieTitle(FlaskForm):
 
 
 """API for movies list"""
-movie_url = "https://api.themoviedb.org/3/search/movie"
-api_key = "badc25885292f12e43fe4bacfaf597aa"
 
 
 if __name__ == '__main__':
