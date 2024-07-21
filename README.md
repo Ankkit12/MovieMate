@@ -7,7 +7,7 @@ Features:
 - Movie API Integration: To browse and select movies.
 - SQLAlchemy: For managing data with an SQLite database.
   
-Explore the code, contribute, or provide feedback.Dive into MovieMate and see how modern web technologies come together!
+Explore the code, contribute, or provide feedback. Dive into MovieMate and see how modern web technologies come together!
 
 Technologies Used:
 
