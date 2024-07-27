@@ -7,7 +7,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
-from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
 
