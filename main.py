@@ -162,4 +162,4 @@ api_key = "badc25885292f12e43fe4bacfaf597aa"
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
