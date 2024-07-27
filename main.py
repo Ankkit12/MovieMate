@@ -140,6 +140,8 @@ def find():
 
 
 """Creating form to edit the movie rating"""
+
+
 class RateMovieForm(FlaskForm):
     rating = StringField(u'Your rating out of 10. e.g 7.5', validators=[DataRequired()])
     review = StringField(u'Your review', validators=[DataRequired()])
@@ -147,12 +149,16 @@ class RateMovieForm(FlaskForm):
 
 
 """Form to add the new movies"""
+
+
 class MovieTitle(FlaskForm):
     title = StringField(u'Movie Title')
     add = SubmitField('Add Movie')
 
 
 """API for movies list"""
+movie_url = "https://api.themoviedb.org/3/search/movie"
+api_key = "badc25885292f12e43fe4bacfaf597aa"
 
 
 if __name__ == '__main__':
