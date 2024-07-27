@@ -7,12 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
-from dotenv import load_dotenv
-import os
 
-load_dotenv()
-api_key = os.getenv('api_key')
-movie_url = os.getenv('movie_url')
 
 
 app = Flask(__name__)
@@ -29,8 +24,7 @@ db = SQLAlchemy(model_class=Base)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"  # sets database path to instance folder
 db.init_app(app)   # initializes database
 
-# Initialize Flask-Migrate
-migrate = Migrate(app, db)
+
 
 
 # CREATE TABLE
