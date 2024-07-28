@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField
 from wtforms.validators import DataRequired
 import requests
+import os
 
 
 
@@ -21,7 +22,7 @@ class Base(DeclarativeBase):
 
 
 db = SQLAlchemy(model_class=Base)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://movies_db_om1f_user:3ZG3FlP05taShlJbEcm3kfPz5xopiTo3@dpg-cqimguij1k6c739hck70-a/movies_db_om1f"  # sets database path to instance folder
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DB_URI")  # sets database path to instance folder
 db.init_app(app)   # initializes database
 
 
@@ -155,4 +156,4 @@ api_key = "badc25885292f12e43fe4bacfaf597aa"
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
