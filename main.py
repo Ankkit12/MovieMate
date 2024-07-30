@@ -22,7 +22,7 @@ class Base(DeclarativeBase):
 
 
 db = SQLAlchemy(model_class=Base)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///movies.db"  # sets database path to instance folder
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://movies_db_naye_user:eiEsSQXtQOKR2BwntAaXhTtvfu1UCvbA@dpg-cqjbtm0gph6c7394voj0-a/movies_db_naye"  # sets database path to instance folder
 db.init_app(app)   # initializes database
 
 
