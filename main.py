@@ -32,7 +32,6 @@ class Movie(db.Model):
     img_url: Mapped[str] = mapped_column(String(500), nullable=True)
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
 
 @app.route("/")
