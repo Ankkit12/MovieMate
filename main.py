@@ -12,13 +12,16 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 Bootstrap5(app)
 
+
 # CREATE DB
 class Base(DeclarativeBase):
     pass
 
+
 db = SQLAlchemy(model_class=Base)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://movies_db_naye_user:eiEsSQXtQOKR2BwntAaXhTtvfu1UCvbA@dpg-cqjbtm0gph6c7394voj0-a/movies_db_naye"
+app.config["SQLALCHEMY_DATABASE_URI"] = ("postgresql://movies_peg9_user:x21yiMwt10OtAZGVywiogKkEmfamtEnz@dpg-crqqch5umphs73bsgtag-a.oregon-postgres.render.com/movies_peg9")
 db.init_app(app)
+
 
 # CREATE TABLE
 class Movie(db.Model):
@@ -31,8 +34,10 @@ class Movie(db.Model):
     review: Mapped[str] = mapped_column(String(500), nullable=True)
     img_url: Mapped[str] = mapped_column(String(500), nullable=True)
 
+
 with app.app_context():
     db.create_all()
+
 
 @app.route("/")
 def home():
@@ -43,6 +48,7 @@ def home():
         all_movies[i].ranking = len(all_movies) - i
     db.session.commit()
     return render_template("index.html", movies=all_movies)
+
 
 @app.route("/edit", methods=['GET', 'POST'])
 def edit():
@@ -56,6 +62,7 @@ def edit():
         return redirect(url_for('home'))
     return render_template("edit.html", form=form, movie=movie1)
 
+
 @app.route("/delete", methods=['GET', 'POST'])
 def delete():
     movie_id = request.args.get("id")
@@ -63,6 +70,7 @@ def delete():
     db.session.delete(movie)
     db.session.commit()
     return redirect(url_for("home"))
+
 
 @app.route("/add", methods=['GET', 'POST'])
 def add():
@@ -73,6 +81,7 @@ def add():
         data = response.json()["results"]
         return render_template("select.html", options=data)
     return render_template("add.html", form=form1)
+
 
 @app.route("/find")
 def find():
@@ -97,14 +106,17 @@ def find():
     db.session.commit()
     return redirect(url_for("edit", id=new_movie.id))
 
+
 class RateMovieForm(FlaskForm):
     rating = StringField(u'Your rating out of 10. e.g 7.5', validators=[DataRequired(), Length(max=4)])
     review = StringField(u'Your review', validators=[DataRequired(), Length(max=500)])
     done = SubmitField('Done')
 
+
 class MovieTitle(FlaskForm):
     title = StringField(u'Movie Title', validators=[DataRequired(), Length(max=500)])
     add = SubmitField('Add Movie')
+
 
 movie_url = "https://api.themoviedb.org/3/search/movie"
 api_key = "badc25885292f12e43fe4bacfaf597aa"
