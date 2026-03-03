@@ -11,8 +11,8 @@ import requests
 
 app = Flask(__name__)
 
-# Use environment variable for secret key (fallback for local dev)
-app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "dev-secret-key")
+# Secret key (use environment in production)
+app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
 
 Bootstrap5(app)
 
@@ -23,17 +23,19 @@ class Base(DeclarativeBase):
 
 db = SQLAlchemy(model_class=Base)
 
-# Use DATABASE_URL from Render environment
 database_url = os.environ.get("DATABASE_URL")
 
-# Fix old postgres:// issue (Render sometimes gives this)
-if database_url and database_url.startswith("postgres://"):
+# Safety check (avoids crash if not set)
+if not database_url:
+    raise ValueError("DATABASE_URL is not set in environment variables")
+
+# Fix postgres:// issue if present
+if database_url.startswith("postgres://"):
     database_url = database_url.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
-# Prevent stale connection crashes on Render
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_pre_ping": True,
     "pool_recycle": 300,
@@ -41,7 +43,7 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 
 db.init_app(app)
 
-# ---------------- CREATE TABLE ---------------- #
+# ---------------- TABLE ---------------- #
 
 class Movie(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -101,9 +103,24 @@ def add():
 
     if form1.validate_on_submit():
         title = form1.title.data
-        response = requests.get(url=movie_url, params={"api_key": api_key, "query": title})
-        data = response.json()["results"]
-        return render_template("select.html", options=data)
+
+        try:
+            response = requests.get(
+                url=movie_url,
+                params={"api_key": api_key, "query": title},
+                timeout=10
+            )
+
+            data = response.json()
+
+            # Safe validation to prevent KeyError
+            if "results" not in data:
+                return f"TMDB API Error: {data}"
+
+            return render_template("select.html", options=data["results"])
+
+        except Exception as e:
+            return f"API Request Failed: {str(e)}"
 
     return render_template("add.html", form=form1)
 
@@ -114,48 +131,69 @@ def find():
     MOVIE_DB_IMAGE_URL = "https://image.tmdb.org/t/p/w500"
     url_movie = f"https://api.themoviedb.org/3/movie/{movie_id}"
 
-    response = requests.get(url_movie, params={"api_key": api_key, "language": "en-US"})
-    data = response.json()
+    try:
+        response = requests.get(
+            url_movie,
+            params={"api_key": api_key, "language": "en-US"},
+            timeout=10
+        )
 
-    title = data["title"][:500]
-    description = data["overview"][:500]
-    img_url = f"{MOVIE_DB_IMAGE_URL}{data['poster_path']}"[:500]
+        data = response.json()
 
-    new_movie = Movie(
-        title=title,
-        year=int(data["release_date"].split("-")[0]),
-        img_url=img_url,
-        description=description
-    )
+        if "title" not in data:
+            return f"TMDB API Error: {data}"
 
-    db.session.add(new_movie)
-    db.session.commit()
+        title = data["title"][:500]
+        description = data.get("overview", "")[:500]
+        img_url = f"{MOVIE_DB_IMAGE_URL}{data.get('poster_path', '')}"[:500]
 
-    return redirect(url_for("edit", id=new_movie.id))
+        new_movie = Movie(
+            title=title,
+            year=int(data["release_date"].split("-")[0]) if data.get("release_date") else None,
+            img_url=img_url,
+            description=description
+        )
+
+        db.session.add(new_movie)
+        db.session.commit()
+
+        return redirect(url_for("edit", id=new_movie.id))
+
+    except Exception as e:
+        return f"API Request Failed: {str(e)}"
 
 
 # ---------------- FORMS ---------------- #
 
 class RateMovieForm(FlaskForm):
-    rating = StringField('Your rating out of 10. e.g 7.5',
-                         validators=[DataRequired(), Length(max=4)])
-    review = StringField('Your review',
-                         validators=[DataRequired(), Length(max=500)])
+    rating = StringField(
+        'Your rating out of 10. e.g 7.5',
+        validators=[DataRequired(), Length(max=4)]
+    )
+    review = StringField(
+        'Your review',
+        validators=[DataRequired(), Length(max=500)]
+    )
     done = SubmitField('Done')
 
 
 class MovieTitle(FlaskForm):
-    title = StringField('Movie Title',
-                        validators=[DataRequired(), Length(max=500)])
+    title = StringField(
+        'Movie Title',
+        validators=[DataRequired(), Length(max=500)]
+    )
     add = SubmitField('Add Movie')
 
 
 # ---------------- API CONFIG ---------------- #
 
 movie_url = "https://api.themoviedb.org/3/search/movie"
-api_key = os.environ.get("TMDB_API_KEY", "your-local-api-key")
 
-# ---------------- RUN LOCAL ---------------- #
+# Use environment variable OR fallback to your existing key
+api_key = os.environ.get("TMDB_API_KEY", "badc25885292f12e43fe4bacfaf597aa")
+
+
+# ---------------- LOCAL RUN ---------------- #
 
 if __name__ == '__main__':
     app.run(debug=True)
